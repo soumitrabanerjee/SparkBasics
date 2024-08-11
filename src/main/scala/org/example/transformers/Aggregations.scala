@@ -2,28 +2,57 @@ package org.example.transformers
 
 import breeze.linalg.roll
 import org.apache.spark.sql.expressions.Window
-import org.apache.spark.sql.functions.{approx_count_distinct, asc_nulls_first, avg, col, corr, count, countDistinct, count_distinct, covar_pop, covar_samp, dense_rank, desc, first, kurtosis, last, max, mean, min, rank, round, skewness, stddev_pop, stddev_samp, sum, sum_distinct, var_pop, var_samp}
+import org.apache.spark.sql.functions.{approx_count_distinct, asc_nulls_first, avg, col, corr, count, countDistinct, count_distinct, covar_pop, covar_samp, dense_rank, desc, first, kurtosis, last, log, max, mean, min, rank, round, skewness, stddev_pop, stddev_samp, sum, sum_distinct, var_pop, var_samp}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 class Aggregations(spark: SparkSession) {
   def aggregationFunc(covidDF: DataFrame): Unit={
     val df: Dataset[Row] = covidDF.
-      select(col("`WHO Region`"), col("`Confirmed`"), col("`Deaths`"), col("`Recovered`"), col("`Recovered / 100 Cases`"), col("`Deaths / 100 Cases`"))
+      select(col("`WHO Region`"),
+        col("`Confirmed`"),
+        col("`Deaths`"),
+        col("`Recovered`"),
+        col("`Recovered / 100 Cases`"),
+        col("`Deaths / 100 Cases`"))
+
     generalAggregation(df)
     mappedAgg(df)
     windowFunc(df)
     rollUp(df)
+    cubeFunc(df)
+  }
+
+  def cubeFunc(df: Dataset[Row]): Unit={
+    println("<<< CUBE FUNC >>>")
+    val newDF = df.
+      cube(col("`WHO Region`"), col("`Recovered / 100 Cases`")).
+      agg(sum("`Recovered`")).
+      orderBy(asc_nulls_first("`WHO Region`"),
+        asc_nulls_first("`Recovered / 100 Cases`"))
+
+    newDF.show(false)
+
+    newDF.
+      selectExpr("*").
+      filter(col("`WHO Region`").isNull || col("`Recovered / 100 Cases`").isNull).
+      show(false)
+
+    newDF.
+      groupBy(col("`WHO Region`"), col("`Recovered / 100 Cases`")).
+      agg(count(col("`Recovered / 100 Cases`"))).
+      filter(col("`WHO Region`").isNull || col("`Recovered / 100 Cases`").isNull).
+      show(false)
   }
 
   def rollUp(df: DataFrame): Unit={
     val rollDF: Dataset[Row] = df.
       rollup(col("`WHO Region`"), col("`Recovered / 100 Cases`")).
-      agg(sum(col("`Recovered`"))).
+      agg(count(col("`Recovered`"))).
       orderBy("`WHO Region`")
 
     rollDF.
       selectExpr("*").
-      filter(col("`WHO Region`").isNull || col("`Recovered / 100 Cases`").isNull || col("`sum(Recovered)`").isNull).
+      filter(col("`WHO Region`").isNull || col("`Recovered / 100 Cases`").isNull || col("`count(Recovered)`").isNull).
       show(false)
 
     rollDF.

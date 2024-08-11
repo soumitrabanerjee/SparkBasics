@@ -5,9 +5,9 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.functions.{col, corr, desc, explode, expr, from_json, lit, monotonically_increasing_id, split, struct, to_json}
 import org.apache.spark.sql.types.StringType
 import org.example.Schemas.jsonSchema.myStructSchema
-import org.example.transformers.SparkUDF
+import org.example.supportiveClasses.SparkUDF
 
-class India(spark: SparkSession) {
+class GeneralOps(spark: SparkSession) {
   def covidInIndia(indiaDF: DataFrame): Unit={
     indiaDF.printSchema()
     val filterDeaths = col("Deaths") > 100 && col("Deaths") < 1000
