@@ -3,7 +3,7 @@ package org.example
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.{col, desc, expr, lit, spark_partition_id}
 import org.example.Schemas.covidDataSchemas
-import org.example.transformers.{Aggregations, DataSets, DataTypes, FileTypes, Joins}
+import org.example.transformers.{AdvancedRDD, Aggregations, DataSets, DataTypes, FileTypes, Joins, RDD, SparkDistributedVariables}
 
 object SparkBasics {
   def main(args: Array[String]): Unit = {
@@ -27,6 +27,9 @@ object SparkBasics {
 //    new FileTypes(spark).getJSONFile()
 //    new FileTypes(spark).getParquetFile(df)
 //    new DataTypes(spark).differentDataTypes()
-    new DataSets(spark).myDataset()
+//    new DataSets(spark).myDataset()
+//    new RDD(spark).rddData()
+    new AdvancedRDD(spark).rdd()
+//    new SparkDistributedVariables(spark).broadcastVariableUsage()
   }
 }

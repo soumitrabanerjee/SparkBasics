@@ -6,7 +6,7 @@ import org.example.Schemas.covidDataSchemas.countrySchema
 
 class RDD(spark: SparkSession) extends Serializable {
   def startsWithI(individual: String): Boolean={
-    individual.startsWith("I")
+    individual.startsWith("A") || individual.startsWith("a")
   }
 
   def reduceWordLength(leftWord: String, rightWord: String): String={
@@ -30,7 +30,9 @@ class RDD(spark: SparkSession) extends Serializable {
     modified_data.values.collect()
 
     rdd_data.getStorageLevel
-    rdd_data.filter(word => startsWithI(word))
+    println("Starts With A")
+    val dataStartWithI = rdd_data.filter(word => startsWithI(word))
+    dataStartWithI.foreach(println)
 
     // Reading document line by line
     val rdd_1 = spark.sparkContext.textFile("/Users/soumitrabanerjee/Desktop/SparkBasics/data/csv/country_wise_latest.csv", 8)
@@ -50,7 +52,5 @@ class RDD(spark: SparkSession) extends Serializable {
     if((matched_data_length/splitted_arr_length) > 0.3)
     {println((matched_data_length/splitted_arr_length) + ": VALID DOCUMENT")} else
     {println((matched_data_length/splitted_arr_length) + ": INVALID DOCUMENT")}
-
-
   }
 }
