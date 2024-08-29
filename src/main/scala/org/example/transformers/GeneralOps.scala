@@ -1,6 +1,5 @@
 package org.example
 
-import org.apache.spark
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.functions.{col, corr, desc, explode, expr, from_json, lit, monotonically_increasing_id, split, struct, to_json}
 import org.apache.spark.sql.types.StringType

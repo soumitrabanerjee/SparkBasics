@@ -38,19 +38,24 @@ class RDD(spark: SparkSession) extends Serializable {
     val rdd_1 = spark.sparkContext.textFile("/Users/soumitrabanerjee/Desktop/SparkBasics/data/csv/country_wise_latest.csv", 8)
     rdd_1.foreachPartition(x => println(x.mkString.split(",").foreach(println)))
     rdd_1.flatMap(data  => data.toSeq)
-    rdd_1.mapPartitions(part => Iterator[Int](2)).sum()
+    rdd_1.mapPartitions(part => Iterator[Int](2))
     rdd_1.reduce(reduceWordLength)
 
 
     // Given a document and a lookup data, if the total number of word match in the document is more than 30% than it's a valid document, else invalid
-    val rdd_2 = spark.sparkContext.wholeTextFiles("/Users/soumitrabanerjee/Desktop/SparkBasics/data/csv/country_wise_latest.csv", 8)
-    val collected_data = rdd_2.collect()
-    val splitted_arr_length: Double = collected_data(0).toString.split(",").length
+    val dataRDD = spark.sparkContext.wholeTextFiles("/Users/soumitrabanerjee/Desktop/SparkLearnings/data/csv/country_wise_latest.csv", 8)
     val lookup_arr = "India,China,NO_COUNTRY_1,Japan,NO_COUNTRY_2,Germany,Ghana,Greece,Greenland,Grenada,Guatemala,Guinea,Guinea-Bissau,Guyana,Haiti,Holy See,Honduras,Hungary,Iceland".split(",")
-    val matched_data = lookup_arr.filter(word => collected_data(0).toString.contains(word))
-    val matched_data_length: Double = matched_data.length.toDouble
-    if((matched_data_length/splitted_arr_length) > 0.3)
-    {println((matched_data_length/splitted_arr_length) + ": VALID DOCUMENT")} else
-    {println((matched_data_length/splitted_arr_length) + ": INVALID DOCUMENT")}
+    val lookupRDD = spark.sparkContext.parallelize(lookup_arr, 8)
+    dataRDD.map(value => value.toString().split(","))
+    lookupRDD.foreach(startsWithI)
+
+//    val collected_data = rdd_2.collect()
+//    val splitted_arr_length: Double = collected_data(0).toString.split(",").length
+//    val lookup_arr = "India,China,NO_COUNTRY_1,Japan,NO_COUNTRY_2,Germany,Ghana,Greece,Greenland,Grenada,Guatemala,Guinea,Guinea-Bissau,Guyana,Haiti,Holy See,Honduras,Hungary,Iceland".split(",")
+//    val matched_data = lookup_arr.filter(word => collected_data(0).toString.contains(word))
+//    val matched_data_length: Double = matched_data.length.toDouble
+//    if((matched_data_length/splitted_arr_length) > 0.3)
+//    {println((matched_data_length/splitted_arr_length) + ": VALID DOCUMENT")} else
+//    {println((matched_data_length/splitted_arr_length) + ": INVALID DOCUMENT")}
   }
 }

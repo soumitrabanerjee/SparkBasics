@@ -2,11 +2,11 @@ package org.example.transformers
 
 import org.apache.spark.sql.SparkSession
 
-case class simpleRdd(num: Int)
+case class simpleRdd(num: BigInt)
 
 class AdvancedRDD(spark: SparkSession) extends Serializable {
-  def getFirstDigit(x: Int): Int={
-    var quot: Int = x
+  def getFirstDigit(x: BigInt): BigInt={
+    var quot: BigInt = x
     while(quot>=0){
       quot = quot/10
     }
@@ -56,7 +56,8 @@ class AdvancedRDD(spark: SparkSession) extends Serializable {
     //OPERATIONS ON RDD
     import spark.implicits._
     println("OPERATIONS ON RDD")
-    val ds = spark.range(2, 100, 4).toDF.as[simpleRdd]
+    val ds = spark.range(2, 100, 4).toDF.
+      withColumnRenamed("id", "num").as[simpleRdd]
     val rdd = spark.sparkContext.parallelize(ds.collect())
     val keywords = rdd.keyBy(x => getFirstDigit(x.num))
     keywords.keys.collect().foreach(println)

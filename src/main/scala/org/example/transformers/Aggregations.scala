@@ -30,7 +30,7 @@ class Aggregations(spark: SparkSession) {
       orderBy(asc_nulls_first("`WHO Region`"),
         asc_nulls_first("`Recovered / 100 Cases`"))
 
-    newDF.show(false)
+    newDF.select(col("`WHO Region`")).distinct().show()
 
     newDF.
       selectExpr("*").
